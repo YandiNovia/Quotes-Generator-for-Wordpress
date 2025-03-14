@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotes Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+        }
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quotes Generator Blogger Kalteng</h1>
+        <div class="form-group">
+            <label for="quote">Tulis kutipan mu:</label>
+            <textarea id="quote" rows="4" placeholder="Write your quote here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="author">Nama mu:</label>
+            <input type="text" id="author" placeholder="Author's name">
+        </div>
+        <button onclick="generateQuote()">Generate HTML</button>
+        <button onclick="downloadImage()">Download as Image</button>
+        <div class="output" id="output"></div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        function generateQuote() {
+            const quote = document.getElementById('quote').value.trim();
+            const author = document.getElementById('author').value.trim();
+
+            if (!quote || !author) {
+                alert('Please fill in both fields!');
+                return;
+            }
+
+            const htmlOutput = `&lt;blockquote&gt;
+  &quot;${quote}&quot;
+  &lt;br&gt;
+  &lt;small&gt;- ${author}&lt;/small&gt;
+&lt;/blockquote&gt;`;
+
+            document.getElementById('output').textContent = htmlOutput;
+        }
+
+        function downloadImage() {
+            const quote = document.getElementById('quote').value.trim();
+            const author = document.getElementById('author').value.trim();
+
+            if (!quote || !author) {
+                alert('Please fill in both fields!');
+                return;
+            }
+
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = 1080;
+            canvas.height = 1080;
+
+            // Set background
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Set text styles
+            ctx.fillStyle = '#333';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+
+            // Set text boundaries
+            const margin = 100; // Increased margin
+            const maxWidth = canvas.width - margin * 2;
+
+            // Wrap and draw the quote
+            const words = quote.split(' ');
+            let line = '';
+            const lineHeight = 40;
+            let y = 400;
+
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line + words[i] + ' ';
+                const testWidth = ctx.measureText(testLine).width;
+                if (testWidth > maxWidth && i > 0) {
+                    ctx.fillText(line, canvas.width / 2, y);
+                    line = words[i] + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, canvas.width / 2, y);
+
+            // Draw the author
+            ctx.font = '24px Arial';
+            ctx.fillText(`- ${author}`, canvas.width / 2, y + lineHeight);
+
+            // Draw bloggerkalteng.com
+            ctx.font = '10px Arial';
+            ctx.fillText(`bloggerkalteng.com`, canvas.width / 2, 1050);
+
+            // Download the image
+            const link = document.createElement('a');
+            link.download = 'quote.jpg';
+            link.href = canvas.toDataURL('image/jpeg');
+            link.click();
+        }
+    </script>
+</body>
+</html>
